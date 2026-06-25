@@ -16,8 +16,7 @@ const statusLabel: Record<string, string> = {
 
 export default async function Home() {
   const { data: features, error } = await supabase
-    .from("features")
-    .select("*")
+    .rpc("get_features_with_comments_count")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -51,9 +50,10 @@ export default async function Home() {
               </span>
             </div>
             <p className="mt-2 text-gray-600">{f.description}</p>
-            <div className="mt-3 flex gap-3 text-xs text-gray-400">
+            <div className="mt-3 flex gap-4 text-xs text-gray-400">
               <span>Priorité : {f.priority}</span>
               <span>Difficulté : {f.difficulty}/5</span>
+              <span>💬 {f.comments_count} commentaire{f.comments_count > 1 ? "s" : ""}</span>
             </div>
           </li>
         ))}
