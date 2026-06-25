@@ -2,6 +2,19 @@ import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
+type Feature = {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  due_date: string | null;
+  user_id: string | null;
+  difficulty: number;
+  created_at: string;
+  comments_count: number;
+};
+
 const statusStyle: Record<string, string> = {
   to_do: "bg-gray-100 text-gray-700",
   in_progress: "bg-amber-100 text-amber-800",
@@ -15,9 +28,7 @@ const statusLabel: Record<string, string> = {
 };
 
 export default async function Home() {
-  const { data: features, error } = await supabase
-    .rpc("get_features_with_comments_count")
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.rpc("get_features_with_comments_count");
 
   if (error) {
     return (
@@ -28,13 +39,16 @@ export default async function Home() {
     );
   }
 
+  const features = (data as Feature[]) ?? [];
+  features.sort((a, b) => b.created_at.localeCompare(a.created_at));
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="text-3xl font-bold mb-2">Roadmap produit</h1>
-      <p className="text-gray-500 mb-8">{features?.length ?? 0} fonctionnalités</p>
+      <p className="text-gray-500 mb-8">{features.length} fonctionnalités</p>
 
       <ul className="grid gap-4">
-        {features?.map((f) => (
+        {features.map((f) => (
           <li
             key={f.id}
             className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
